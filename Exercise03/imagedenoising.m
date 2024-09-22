@@ -14,18 +14,33 @@ imng(imng<0) = 0; imng(imng>1) = 1;
 
 %% Gaussian filter of size 11x11 and std 2.5 
 sigmad=2.5;
+
+kernel_size = 11;
+x = -floor(kernel_size/2):floor(kernel_size/2);
+gaussian_1d = exp(-(x.*x)/(2*sigmad*sigmad));
+gaussian_1d = gaussian_1d / sum(gaussian_1d); % Normalize the kernel
+
 h = fspecial('gaussian', [11 11],2.5);
 %% Instead of directly filtering with h, make a separable implementation
 % where you use horizontal and vertical 1D convolutions
-gflt_imns=imfilter(imns,h);
-gflt_imng=imfilter(imng,h);
+% gflt_imns=imfilter(imns,h);
+% gflt_imng=imfilter(imng,h);
+
+% % For imns image
+gflt_imns_h = conv2(imns, gaussian_1d, 'same');  % horizontal convolution
+gflt_imns = conv2(gflt_imns_h, gaussian_1d', 'same');  % vertical convolution
+
+% % For imng image
+gflt_imng_h = conv2(imng, gaussian_1d, 'same');  % horizontal convolution
+gflt_imng = conv2(gflt_imng_h, gaussian_1d', 'same');  % vertical convolution
+
 % That is, replace the above two lines, you can use conv2 and 
 % one dimensional Gaussian filter kernel with the same standard deviation.
 % The result should not change.
 
 %% Apply median filtering, use neighborhood size 5x5
-medflt_imns=zeros(size(im));%%Replace with median filtered version of 'imns'
-medflt_imng=zeros(size(im));%%Replace with median filtered version of 'imng'
+medflt_imns=medfilt2(imns, [5 5]);%%Replace with median filtered version of 'imns'
+medflt_imng=medfilt2(imng, [5 5]);%%Replace with median filtered version of 'imng'
 % That is, replace the above two lines, you can use matlab built-in function medfilt2
 
 %% Bilateral filter parameters are defined below.
@@ -33,10 +48,10 @@ w     = 5;       % bilateral filter half-width, filter size = 2*w+1 = 11
 sigma = [2.5 0.1]; % bilateral filter standard deviations
 
 %% Apply bilateral filter to each image.
-bflt_imns=zeros(size(im));%%Replace with bilateral filtered version of 'imns'
-bflt_imng=zeros(size(im));%%Replace with bilateral filtered version of 'imng'
-%bflt_imns = bilateralfilter(imns,w,sigma);
-%bflt_imng = bilateralfilter(imng,w,sigma);
+% bflt_imns=zeros(size(im));%%Replace with bilateral filtered version of 'imns'
+% bflt_imng=zeros(size(im));%%Replace with bilateral filtered version of 'imng'
+bflt_imns = bilateralfilter(imns,w,sigma);
+bflt_imng = bilateralfilter(imng,w,sigma);
 % That is, you need to implement bilateralfilter.m and use it above
 % Use formulas (3.34)-(3.37) from Szeliski's book 
 % with values sigma_d=sigma(1), sigma_r=sigma(2)

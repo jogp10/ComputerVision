@@ -45,7 +45,7 @@ for c=1:3
 end
 maska = 1-maskb;
 
-level = 8
+level = 8;
 
 %% Make Laplacian image pyramids with 8 levels.
 % Output is cell array (i.e. lpimga{i} is the Laplacian image at level i).
@@ -53,16 +53,16 @@ level = 8
 % corresponding Gaussian pyramid.
 % In the version below the second input is either 'lap' or 'gauss',
 % and it defines whether to output Laplacian or Gaussian pyramid.
-%lpimga = generateLaplacianPyramid(imga,'lap',level);
-%lpimgb = generateLaplacianPyramid(imgb,'lap',level);
+lpimga = generateLaplacianPyramid(imga,'lap',level);
+lpimgb = generateLaplacianPyramid(imgb,'lap',level);
 
 %% Check that reconstruction works by examining the error (which should be small)
-%ima=reconstLaplacianPyramid(lpimga);
-%max_reconstruction_error=max(abs(imga(:)-ima(:)))
+ima=reconstLaplacianPyramid(lpimga);
+max_reconstruction_error=max(abs(imga(:)-ima(:)));
 
 %% Make Gaussian image pyramids of the mask images, maska and maskb
-%gpmaska = generateLaplacianPyramid(maska,'gauss',level); %
-%gpmaskb = generateLaplacianPyramid(maskb,'gauss',level);
+gpmaska = generateLaplacianPyramid(maska,'gauss',level); %
+gpmaskb = generateLaplacianPyramid(maskb,'gauss',level);
 
 %% Make smooth masks in a simple manner for comparison (no need to modidy)
 blurh = fspecial('gauss',60,20); 
@@ -71,20 +71,20 @@ smaskb = imfilter(maskb,blurh,'replicate');
 
 %% In practice, you can also use the Gaussian pyramids of smoothed masks. 
 % In this case, the blendings (simple & pyramid) will appear more similar.
-%gpsmaska = generateLaplacianPyramid(smaska,'gauss',level); %
-%gpsmaskb = generateLaplacianPyramid(smaskb,'gauss',level);
+gpsmaska = generateLaplacianPyramid(smaska,'gauss',level); %
+gpsmaskb = generateLaplacianPyramid(smaskb,'gauss',level);
 
 %% Blending
 limgo = cell(1,level); % the blended pyramid
 for p = 1:level
     % Blend the Laplacian images at each level 
     % (You can use either one of the two rows below.)  
-	%limgo{p} = (lpimga{p}.*gpmaska{p} + lpimgb{p}.*gpmaskb{p})./(gpmaska{p}+gpmaskb{p});
-	%limgo{p} = (lpimga{p}.*gpsmaska{p} + lpimgb{p}.*gpsmaskb{p})./(gpsmaska{p}+gpsmaskb{p});
+	% limgo{p} = (lpimga{p}.*gpmaska{p} + lpimgb{p}.*gpmaskb{p})./(gpmaska{p}+gpmaskb{p});
+	limgo{p} = (lpimga{p}.*gpsmaska{p} + lpimgb{p}.*gpsmaskb{p})./(gpsmaska{p}+gpsmaskb{p});
 end
 
 %% Reconstruct the blended image from its Laplacian pyramid  
-%imgo = reconstLaplacianPyramid(limgo);
+imgo = reconstLaplacianPyramid(limgo);
 
 % Simple blending with smooth masks without a pyramid
 imgo1 = smaska.*imga+smaskb.*imgb;
@@ -105,10 +105,10 @@ title('Simple Blending');
 
 % run the commented lines below to visualize results
 %
-% subplot(2,3,5); imshow(imgo);
-% axis image;
-% title('Pyramid Blending');
+subplot(2,3,5); imshow(imgo);
+axis image;
+title('Pyramid Blending');
 % 
-% subplot(2,3,6); imagesc(max(imgo-imgo1,[],3));
-% axis image;axis off;colormap('gray');colorbar
-% title('Difference:');
+subplot(2,3,6); imagesc(max(imgo-imgo1,[],3));
+axis image;axis off;colormap('gray');colorbar
+title('Difference:');

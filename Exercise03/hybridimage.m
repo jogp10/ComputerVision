@@ -37,11 +37,38 @@ wolft_lowpass= imfilter(wolft, filterB, 'replicate');
 %
 % Thus, your task is to replace the zero image on the following line
 % with a high-pass filtered version of 'wolft'
-wolft_highpass=zeros(size(man_lowpass));
+wolft_highpass=wolft-wolft_lowpass;
 
 %% Replace also the zero image below with the correct hybrid image
-hybrid_image=zeros(size(man_lowpass)); %comment this line and uncomment next one
-%hybrid_image = man_lowpass + wolft_highpass;
+% hybrid_image=zeros(size(man_lowpass)); %comment this line and uncomment next one
+hybrid_image = man_lowpass + wolft_highpass;
+
+%% Fourier transforms
+F_wolf = fftshift(fft2(wolf));
+F_man = fftshift(fft2(man));
+F_man_lowpass = fftshift(fft2(man_lowpass));
+F_wolft_lowpass = fftshift(fft2(wolft_lowpass));
+F_wolft_highpass = fftshift(fft2(wolft_highpass));
+F_hybrid_image = fftshift(fft2(hybrid_image));
+
+% Display the Fourier transforms
+figure;
+subplot(2, 2, 1);
+imshow(log(abs(F_wolf)+1), []);
+title('Fourier transform of wolf');
+
+subplot(2, 2, 2);
+imshow(log(abs(F_man)+1), []);
+title('Fourier transform of man');
+
+subplot(2, 2, 3);
+imshow(log(abs(F_man_lowpass)+1), []);
+title('Fourier transform of man lowpass');
+
+subplot(2, 2, 4);
+imshow(log(abs(F_wolft_lowpass)+1), []);
+title('Fourier transform of wolf highpass');
+
 
 %% Visualization and interpretation
 % Notice how strongly the interpretation of the hybrid image is affected 
@@ -68,4 +95,4 @@ subplot(2,2,4); imagesc(hybrid_image);
 axis image; colormap gray;
 title('Hybrid Image');
 
-%figure(fighybrid);
+figure(fighybrid);
