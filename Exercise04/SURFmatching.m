@@ -65,11 +65,15 @@ end
 % Below we sort the mutually nearest neighbors based on the distance. 
 nnd=pairs(:,3);
 [snnd,id_nnd]=sort(nnd,1,'ascend');
+nndr = zeros(size(pairs,1), 1);  % Initialize NNDR array
 % Here 'sd' is a variable that will be helpful for re-sorting the pairs 
 % according to the nearest neighbor distance ratio (NNDR). See the task below.
 for k=1:size(pairs,1)
     sd=sort(distmat(pairs(k,1),:),2,'ascend');
+    nndr(k) = sd(1) / sd(2);  % Compute NNDR as ratio of nearest to second nearest distance
 end
+
+[sorted_nndr, id_nndr] = sort(nndr, 'ascend');  % Sort the NNDR values in ascending order
 
 
 % We visualize the 5 best matches 
@@ -77,10 +81,10 @@ Nvis=5;
 
 fig1=figure;
 imshow([I1  I2]);hold on;
-title('The top 5 mutual nearest neighbors of SURF features');
+title('The top 5 mutual nearest neighbors of SURF features by NNDR');
     
 t=[0:1:360]/180*pi;
-idlist=id_nnd;
+idlist=id_nndr;
 for k=1:Nvis
     pid1=pairs(idlist(k),1);
     pid2=pairs(idlist(k),2);

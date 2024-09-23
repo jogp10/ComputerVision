@@ -36,9 +36,8 @@ for i=1:Nscales
 
     %%-your-code-starts-here-%%
         
-    
-    
-        
+    tmpxx = imfilter(img, gxx, 'replicate');
+    tmpyy = imfilter(img, gyy, 'replicate');
         
     %%-your-code-ends-here-%%
     

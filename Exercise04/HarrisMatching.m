@@ -75,8 +75,22 @@ end
 % We compute the sum of squared differences (SSD) of pixels' intensities
 % for all pairs of patches extracted from the two images
 SumOfSquaredDiff=zeros(n,m);
+NormalizedCrossCorrelation=zeros(n,m);
+
 for i=1:n
+    patchA_mean = mean(mean(patchA(:,:,i)));
+    patchA_norm = patchA(:,:,i) - patchA_mean;
+    patchA_std = std(patchA_norm(:));
+    
     for j=1:m
+        patchB_mean = mean(mean(patchB(:,:,j)));
+        patchB_norm = patchB(:,:,j) - patchB_mean;
+        patchB_std = std(patchB_norm(:));
+        
+        numerator = sum(sum(patchA_norm .* patchB_norm));
+        denominator = patchA_std * patchB_std;
+        
+        NormalizedCrossCorrelation(i,j) = numerator / denominator;
         SumOfSquaredDiff(i,j)=sum(sum((patchA(:,:,i)-patchB(:,:,j)).^2));
     end
 end
@@ -85,24 +99,28 @@ end
 % according to the SSD measure
 [ss2,ids2]=min(SumOfSquaredDiff,[],2);
 [ss1,ids1]=min(SumOfSquaredDiff,[],1);
+[ncc2,ncc2_ids]=max(NormalizedCrossCorrelation,[],2);
+[ncc1,ncc1_ids]=max(NormalizedCrossCorrelation,[],1);
 pairs=[];
 for k=1:n
     if k==ids1(ids2(k))
-        pairs=[pairs;k ids2(k) ss2(k)];
+        % pairs=[pairs;k ids2(k) ss2(k)];
+        pairs=[pairs;k ncc2_ids(k) ncc2(k)];
     end
 end
 
 % We sort the mutually nearest neighbors based on the SSD
-[sorted_ssd,id_ssd]=sort(pairs(:,3),1,'ascend');
+% [sorted_ssd,id_ssd]=sort(pairs(:,3),1,'ascend');
+[sorted_ncc,id_ncc]=sort(pairs(:,3),1,'descend');
 
 % Next we visualize the 40 best matches which are mutual nearest neighbors
 % and have the smallest SSD values
 Nvis=40;
 montage=[I1 I2];
 figure;imagesc(montage);axis image; colormap('gray');hold on
-title('The best 40 matches according to SSD measure');
-for k=1:min(length(id_ssd),40)
-    l=id_ssd(k);
+title('The best 40 matches according to NCC measure');
+for k=1:min(length(id_ncc),40)
+    l=id_ncc(k);
     plot(x1(pairs(l,1)),y1(pairs(l,1)),'mx');
     plot(x2(pairs(l,2))+size(I1,2),y2(pairs(l,2)),'mx');
     plot([x1(pairs(l,1)); x2(pairs(l,2))+size(I1,2)],[y1(pairs(l,1)); y2(pairs(l,2))],'c-','LineWidth',1);

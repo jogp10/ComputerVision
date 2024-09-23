@@ -49,9 +49,9 @@ load blobs2;
 % Fill in the missing part in scaleSpaceBlobs.m
 % Everything should then work if you uncomment the following three lines.
 
-%N=500;
-%blobs1=scaleSpaceBlobs(double(I1),N);
-%blobs2=scaleSpaceBlobs(double(I2),N);
+N=100;
+blobs1=scaleSpaceBlobs(double(I1),N);
+blobs2=scaleSpaceBlobs(double(I2),N);
 
 NVIS=50;
 % scale blob radius with factor 3 for better visualization
@@ -91,4 +91,3 @@ for k=1:Nvis
     plot(loc2(1)+r2*cos(t)+size(I1,2),loc2(2)+r2*sin(t),'m-','LineWidth',3);
     plot([loc1(1);loc2(1)+size(I1,2)],[loc1(2); loc2(2)],'c-');
 end
-
