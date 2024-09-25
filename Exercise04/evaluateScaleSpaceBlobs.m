@@ -49,9 +49,9 @@ load blobs2;
 % Fill in the missing part in scaleSpaceBlobs.m
 % Everything should then work if you uncomment the following three lines.
 
-N=100;
-blobs1=scaleSpaceBlobs(double(I1),N);
-blobs2=scaleSpaceBlobs(double(I2),N);
+%N=100;
+%blobs1=scaleSpaceBlobs(double(I1),N);
+%blobs2=scaleSpaceBlobs(double(I2),N);
 
 NVIS=50;
 % scale blob radius with factor 3 for better visualization

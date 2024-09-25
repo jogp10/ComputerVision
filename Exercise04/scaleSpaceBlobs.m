@@ -36,8 +36,9 @@ for i=1:Nscales
 
     %%-your-code-starts-here-%%
         
-    tmpxx = imfilter(img, gxx, 'replicate');
-    tmpyy = imfilter(img, gyy, 'replicate');
+    tmpxx = conv2(img, gxx, "same");
+    tmpyy = conv2(img, gyy, "same");
+    % scalespace(:,:,i) = imfilter(img, scaleNormalizedLaplacian{i}, 'replicate').^2;
         
     %%-your-code-ends-here-%%
     
