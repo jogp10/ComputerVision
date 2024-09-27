@@ -78,17 +78,9 @@ SumOfSquaredDiff=zeros(n,m);
 NormalizedCrossCorrelation=zeros(n,m);
 
 for i=1:n
-    patchA_mean = mean(mean(patchA(:,:,i)));
-    patchA_norm = patchA(:,:,i) - patchA_mean;
-    patchA_std = std(patchA_norm(:));
-    
     for j=1:m
-        patchB_mean = mean(mean(patchB(:,:,j)));
-        patchB_norm = patchB(:,:,j) - patchB_mean;
-        patchB_std = std(patchB_norm(:));
-        
-        numerator = sum(sum(patchA_norm .* patchB_norm));
-        denominator = patchA_std * patchB_std;
+        numerator = sum(sum((patchA(:,:,i) - mA(i)) .* (patchB(:,:,j) - mB(j))));
+        denominator = sA(i) * sB(j);
         
         NormalizedCrossCorrelation(i,j) = numerator / denominator;
         SumOfSquaredDiff(i,j)=sum(sum((patchA(:,:,i)-patchB(:,:,j)).^2));
@@ -103,7 +95,7 @@ end
 [ncc1,ncc1_ids]=max(NormalizedCrossCorrelation,[],1);
 pairs=[];
 for k=1:n
-    if k==ids1(ids2(k))
+    if k==ncc1_ids(ncc2_ids(k))
         % pairs=[pairs;k ids2(k) ss2(k)];
         pairs=[pairs;k ncc2_ids(k) ncc2(k)];
     end
