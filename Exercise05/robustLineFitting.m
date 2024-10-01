@@ -8,7 +8,9 @@ axis equal
 p = 0.99; % probability of success
 e = 0.5; % probability that a point is an outlier
 s = 2; % number of points to fit the model
-t = 0.10; % threshold
+std_x = std(x); 
+std_y = std(y);
+t = 5; %sqrt(3.84) * sqrt(std_x^2 + std_y^2); % threshold
 Np = length(x); % number of points
 N = log(1-p)/log(1-(1-e)^s); % number of iterations
 
@@ -26,7 +28,6 @@ for i = 1:N
     % fit the model
     slope = (y2-y1)/(x2-x1);
     intercept = y1 - slope * x1;
-    line = slope*x+intercept;
     
     % Find inliers by calculating the distance from the line
     d = abs(slope * x - y + intercept) / sqrt(slope^2 + 1);
@@ -39,37 +40,33 @@ for i = 1:N
     end
 end
 
-x_inliers = x(bestInliers);
-y_inliers = y(bestInliers);
+% Re-fit using total least squares on inliers
+U = [x(bestInliers) - mean(x(bestInliers)), y(bestInliers) - mean(y(bestInliers))];
+[~, ~, V] = svd(U); % Singular value decomposition
 
-x_plot = linspace(min(x), max(x), 100);
-y_plot = bestModel(1) * x_plot + bestModel(2);
+% The eigenvector corresponding to the smallest eigenvalue
+a = V(1,1); 
+b = V(2,1); 
 
-% Plot the original data points
+d = (a * sum(x(bestInliers)) + b * sum(y(bestInliers))) / length(bestInliers);
+
+% Plot the points and the estimated line
 figure;
-scatter(x, y, 'b'); 
+plot(x, y, 'ro'); 
+
 hold on;
+xFit = linspace(min(x), max(x), 100);
+yFit = -(a/b) * xFit + d/b;
+plot(xFit, yFit, 'b-', 'LineWidth', 2);
 
-% Plot the fitted line
-plot(x_plot, y_plot, 'r', 'LineWidth', 2);
-
-% Plot the inliers
 scatter(x_inliers, y_inliers, 'g');
 
-legend('Data Points', 'Fitted Line', 'Inliers');
-xlabel('X');
-ylabel('Y');
-title('RANSAC Line Fitting');
-
-% Display the equation of the best line on the plot
-equationText = ['y = ', num2str(bestModel(1), '%.2f'), 'x + ', num2str(bestModel(2), '%.2f')];
-x_pos = mean(x); % Position the text around the center of the x values
-y_pos = mean(y) + 0.1; % Position the text slightly below the top of the y range
-text(x_pos, y_pos, equationText, 'FontSize', 12, 'Color', 'k', 'BackgroundColor', 'w');
+legend('Data points', 'Estimated line', 'Inliers');
+xlabel('x'); ylabel('y');
+title('RANSAC Fitting');
 
 hold off;
 
-% Report the best model
-disp(['Best slope a = ', num2str(bestModel(1))]);
-disp(['Best intercept b = ', num2str(bestModel(2))]);
-disp(['Equation of best line: y = ', num2str(bestModel(1)), 'x + ', num2str(bestModel(2))]);
+% Print the estimated line
+disp(['Estimated line: y = ' num2str(-a/b) 'x + ' num2str(d/b)]);
+disp(['a = ' num2str(a) ', b = ' num2str(b), ', d = ' num2str(d)]);
