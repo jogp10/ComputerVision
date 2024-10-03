@@ -10,7 +10,7 @@ e = 0.5; % probability that a point is an outlier
 s = 2; % number of points to fit the model
 std_x = std(x); 
 std_y = std(y);
-t = 5; %sqrt(3.84) * sqrt(std_x^2 + std_y^2); % threshold
+t = sqrt(3.84) * sqrt(std_x^2 + std_y^2); % threshold
 Np = length(x); % number of points
 N = log(1-p)/log(1-(1-e)^s); % number of iterations
 
@@ -41,12 +41,12 @@ for i = 1:N
 end
 
 % Re-fit using total least squares on inliers
-U = [x(bestInliers) - mean(x(bestInliers)), y(bestInliers) - mean(y(bestInliers))];
-[~, ~, V] = svd(U); % Singular value decomposition
+U = [(x(bestInliers) - mean(x(bestInliers)))', (y(bestInliers) - mean(y(bestInliers)))'];
+[~, ~, V] = svd(U'*U); % Singular value decomposition
 
 % The eigenvector corresponding to the smallest eigenvalue
-a = V(1,1); 
-b = V(2,1); 
+a = V(1,end); 
+b = V(2,end); 
 
 d = (a * sum(x(bestInliers)) + b * sum(y(bestInliers))) / length(bestInliers);
 
@@ -59,7 +59,6 @@ xFit = linspace(min(x), max(x), 100);
 yFit = -(a/b) * xFit + d/b;
 plot(xFit, yFit, 'b-', 'LineWidth', 2);
 
-scatter(x_inliers, y_inliers, 'g');
 
 legend('Data points', 'Estimated line', 'Inliers');
 xlabel('x'); ylabel('y');
