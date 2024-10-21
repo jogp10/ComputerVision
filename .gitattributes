@@ -1,0 +1,7 @@
+practical-instance-recognition-2018a/data/graf filter=lfs diff=lfs merge=lfs -text
+practical-instance-recognition-2018a/data/oxbuild_lite filter=lfs diff=lfs merge=lfs -text
+practical-instance-recognition-2018a/data/oxbuild_lite_imdb_100k_disc_dog.mat filter=lfs diff=lfs merge=lfs -text
+practical-instance-recognition-2018a/data/oxbuild_lite_imdb_100k_ellipse_dog.mat filter=lfs diff=lfs merge=lfs -text
+practical-instance-recognition-2018a/data/oxbuild_lite_imdb.mat filter=lfs diff=lfs merge=lfs -text
+practical-instance-recognition-2018a/data/paintings_imdb_100k_disc_dog.mat filter=lfs diff=lfs merge=lfs -text
+practical-instance-recognition-2018a/data/queries filter=lfs diff=lfs merge=lfs -text
